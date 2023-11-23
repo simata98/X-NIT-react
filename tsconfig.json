@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "backup_src/count_number.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
