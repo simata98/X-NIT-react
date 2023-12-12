@@ -9,10 +9,10 @@ import {
   Switcher,
   Title,
   Wrapper,
-} from "../component/auth-components";
+} from "../components/auth-components";
 import { auth } from "../firebase";
-import GithubButton from "../component/github-btn";
-import GoogleButton from "../component/google-btn";
+import GithubButton from "../components/github-btn";
+import GoogleButton from "../components/google-btn";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

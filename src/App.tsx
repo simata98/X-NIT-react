@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Layout from "./component/layout";
+import Layout from "./components/layout";
 import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
 import styled, { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
-import LoadingScreen from "./component/loading-screen";
+import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
-import ProtectedRoute from "./component/protected-route";
+import ProtectedRoute from "./components/protected-route";
 
 const router = createBrowserRouter([
   {
@@ -46,8 +46,7 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
   body {
-    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
-    animation: gradient 15s ease infinite;
+    background: #343444;
     color: white;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }

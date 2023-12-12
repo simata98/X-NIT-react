@@ -10,9 +10,9 @@ import {
   Wrapper,
   Form,
   Content,
-} from "../component/auth-components";
-import GithubButton from "../component/github-btn";
-import GoogleButton from "../component/google-btn";
+} from "../components/auth-components";
+import GithubButton from "../components/github-btn";
+import GoogleButton from "../components/google-btn";
 import { toast } from "react-toastify";
 
 export default function CreateAccount() {
@@ -22,7 +22,7 @@ export default function CreateAccount() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setConfirmPassword] = useState("");
-  const [shake, setShake] = useState(false); // shake animation [true, false
+  const [shake, setShake] = useState(false); // shake animation
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -38,6 +38,7 @@ export default function CreateAccount() {
       setConfirmPassword(value);
     }
   };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevent default behavior of form
     setShake(false); // reset shake
@@ -54,11 +55,7 @@ export default function CreateAccount() {
     // create an account
     try {
       setLoading(true);
-      const credentials = createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const credentials = createUserWithEmailAndPassword(auth, email, password);
       toast.promise(credentials, {
         pending: "회원가입 중...",
         success: "회원가입 성공!",
