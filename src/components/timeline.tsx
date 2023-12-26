@@ -4,6 +4,8 @@ import { db } from "../firebase";
 import { styled } from "styled-components";
 import Tweet from "./tweet";
 import { Unsubscribe } from "firebase/auth";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 export interface ITweet {
   id: string;
@@ -30,6 +32,7 @@ export default function Timeline() {
   // onSnapshot 사용 시 realtime으로 데이터를 받아옴
 
   useEffect(() => {
+    AOS.init({duration: 2000});
     let unsubscribe: Unsubscribe | null = null;
     const fetchTweets = async () => {
       const tweetsQuery = query(
@@ -50,6 +53,7 @@ export default function Timeline() {
           };
         });
         setTweets(tweets);
+        AOS.refresh();
       });
     };
     fetchTweets();
@@ -57,8 +61,9 @@ export default function Timeline() {
       unsubscribe && unsubscribe();
     };
   }, []);
+
   return (
-    <Wrapper>
+    <Wrapper data-aos="fade-up">
       {tweets.map((tweet) => (
         <Tweet key={tweet.id} {...tweet} />
       ))}

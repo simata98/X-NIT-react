@@ -77,7 +77,7 @@ export default function EditTweetForm({ id, tweet, photo, setIsEditing }: ITweet
   const onEditFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (files?.length) {
-      if (files[0].size > 1024 * 1024) {
+      if (files[0].size > 1024 * 1024 * 10) {
         alert("파일 사이즈는 1MB를 넘을 수 없습니다.");
         return;
       }
