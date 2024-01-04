@@ -1,5 +1,3 @@
-import { FirebaseError } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -10,18 +8,41 @@ import {
   Title,
   Wrapper,
 } from "../components/auth-components";
-import { auth } from "../firebase";
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { useMutation } from "react-query";
 
-export default function CreateAccount() {
+export default function Login() {
   const navigate = useNavigate();
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [shake, setShake] = useState(false); // shake animation [true, false
+  const loginMutation = useMutation(
+    async ({ username, password }: { username: string, password: string }) => {
+      const response = await axios.post("http://localhost:8000/account/token/", {
+        username,
+        password,
+      });
+      return response.data;
+    },
+    {
+      onSuccess: (data) => {
+        // Save the token in local storage on success
+        localStorage.setItem('token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        toast.success("로그인 성공!");
+        navigate("/");
+      },
+      onError: () => {
+        toast.error("로그인 실패");
+      },
+    }
+  );
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
       target: { name, value },
@@ -32,38 +53,53 @@ export default function CreateAccount() {
       setPassword(value);
     }
   };
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevent default behavior of form
     setShake(false); // reset shake
-    if (isLoading || email === "" || password === "") return;
+    if (loginMutation.isLoading || email === "" || password === "") return;
     // create an account
-    try {
-      setLoading(true);
-      const signInPromise = signInWithEmailAndPassword(auth, email, password);
-      toast.promise(signInPromise, {
-        pending: "로그인 중...",
-        success: "로그인 성공!",
-        error: "로그인 실패",
-      });
-      await signInPromise;
-      navigate("/");
-    } catch (e) {
-      if (e instanceof FirebaseError) {
-        const errorMessages: { [key: string]: string } = {
-          "auth/email-already-in-use": "이미 사용된 이메일입니다.",
-          "auth/invalid-email": "이메일이 올바르지 않습니다.",
-          "auth/weak-password": "약한 패스워드 패턴입니다.",
-          "auth/invalid-login-credentials": "올바르지 않은 로그인 정보입니다.",
-          "auth/too-many-requests":
-            "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.",
-        };
-        toast.error(errorMessages[e.code] || e.message);
-        setShake(true);
-      }
-    } finally {
-      setLoading(false);
-    }
+    loginMutation.mutate({ username: email, password });
   };
+  // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const {
+  //     target: { name, value },
+  //   } = e;
+  //   if (name === "email") {
+  //     setEmail(value);
+  //   } else if (name === "password") {
+  //     setPassword(value);
+  //   }
+  // };
+  // const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault(); // prevent default behavior of form
+  //   setShake(false); // reset shake
+  //   if (isLoading || email === "" || password === "") return;
+  //   // create an account
+  //   try {
+  //     setLoading(true);
+  //     const signInPromise = axios.post("http://localhost:8000/account/token/", {
+  //       username: email,
+  //       password: password,
+  //     });
+  //     toast.promise(signInPromise, {
+  //       pending: "로그인 중...",
+  //       success: "로그인 성공!",
+  //       error: "로그인 실패",
+  //     });
+  //     const response = await signInPromise;
+  //     const token = response.data.access;
+  //     localStorage.setItem("token", token);
+  //     navigate("/");
+  //   } catch (e) {
+  //     if (e) {
+  //       toast.error(axios.isAxiosError<{ message: string }>(e));
+  //       setShake(true);
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   return (
     <Wrapper>
       <Content shake={shake ? true : undefined}>

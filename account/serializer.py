@@ -4,7 +4,6 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import validate_email
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
@@ -20,14 +19,26 @@ class UsernameValidator(UnicodeUsernameValidator):
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
-        token = RefreshToken.for_user(user)
+        token = super().get_token(user)
         return token
+
+    def validate(self, attrs):
+        credentials = {
+            'username': '',
+            'password': attrs.get('password')
+        }
+
+        user = User.objects.filter(email=attrs.get('username')).first()
+        if user:
+            credentials['username'] = user
+
+        return super().validate(credentials)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
     username_validator = UsernameValidator()
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+    passwordConfirm = serializers.CharField(write_only=True, required=True)
     email = serializers.EmailField(write_only=True, required=True)
     username = serializers.CharField(
         write_only=True,
@@ -37,10 +48,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'password2')
+        fields = ('username', 'email', 'password', 'passwordConfirm')
 
     def validate(self, value):
-        if value['password'] != value['password2']:
+        if value['password'] != value['passwordConfirm']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
         if validate_email(value['email']):
             raise serializers.ValidationError({"email": "Email is not valid."})

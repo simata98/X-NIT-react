@@ -6,6 +6,7 @@ import { deleteObject, ref } from "firebase/storage";
 import { useState } from "react";
 import EditTweetForm from "./edit-tweet-form";
 
+
 const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 3fr 1fr;

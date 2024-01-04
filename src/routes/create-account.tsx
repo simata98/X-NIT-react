@@ -1,8 +1,5 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React, { useState } from "react";
-import { auth } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
-import { FirebaseError } from "firebase/app";
 import {
   Input,
   Switcher,
@@ -14,6 +11,7 @@ import {
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -55,25 +53,26 @@ export default function CreateAccount() {
     // create an account
     try {
       setLoading(true);
-      const credentials = createUserWithEmailAndPassword(auth, email, password);
-      toast.promise(credentials, {
-        pending: "회원가입 중...",
-        success: "회원가입 성공!",
-        error: "회원가입 실패",
+      const promise = axios.post("http://localhost:8000/account/register/", {
+        username: name,
+        email: email,
+        password: password,
+        passwordConfirm: passwordConfirm,
       });
-      await updateProfile((await credentials).user, { displayName: name });
+      toast.promise(
+        promise,
+        {
+          pending: "회원가입 중...",
+          success: "회원가입 성공!",
+          error: "회원가입 실패",
+        }
+      );
+
+      await promise;
       navigate("/");
     } catch (e) {
-      if (e instanceof FirebaseError) {
-        const errorMessages: { [key: string]: string } = {
-          "auth/email-already-in-use": "이미 사용된 이메일입니다.",
-          "auth/invalid-email": "이메일이 올바르지 않습니다.",
-          "auth/weak-password": "약한 패스워드 패턴입니다.",
-          "auth/invalid-login-credentials": "올바르지 않은 로그인 정보입니다.",
-        };
-        toast.error(errorMessages[e.code] || e.message);
-        setShake(true);
-      }
+      toast.error(axios.isAxiosError<{ message: string }>(e));
+      navigate("/login")
     } finally {
       setLoading(false);
     }

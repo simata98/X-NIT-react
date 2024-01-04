@@ -1,6 +1,8 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { auth } from "../firebase";
+import { useMutation } from "react-query";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Wrapper = styled.div`
   display: grid;
@@ -42,11 +44,32 @@ const MenuItem = styled.div`
 
 export default function Layout() {
   const navigate = useNavigate();
-  const onLogOut = async () => {
+  const logoutMutation = useMutation(
+    async () => {
+      const refreshToken = localStorage.getItem('refresh_token');
+      await axios.post("http://localhost:8000/account/logout/", {
+        refresh: refreshToken,
+      }), {
+      };
+    },
+    {
+      onSuccess: () => {
+        // Remove the token from local storage on success
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        toast.success("로그아웃 성공!");
+        navigate("/login");
+      },
+      onError: () => {
+        toast.error("로그아웃 실패");
+      },
+    }
+  );
+
+  const onLogOut = () => {
     const ok = confirm("로그아웃 하시겠습니까?");
     if (ok) {
-      await auth.signOut();
-      navigate("/login");
+      logoutMutation.mutate();
     }
   };
   return (

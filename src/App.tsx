@@ -8,8 +8,12 @@ import CreateAccount from "./routes/create-account";
 import styled, { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 import LoadingScreen from "./components/loading-screen";
-import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+import {ReactQueryDevtools} from "react-query/devtools";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -62,7 +66,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const init = async () => {
     // wait for firebase auth
-    await auth.authStateReady();
     setIsLoading(false);
   };
   useEffect(() => {
@@ -71,8 +74,11 @@ function App() {
 
   return (
     <Wrapper>
+      <QueryClientProvider client={queryClient}>
       <GlobalStyles />
       {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+      <ReactQueryDevtools initialIsOpen={true}/> 
+      </QueryClientProvider>
     </Wrapper>
   );
 }
