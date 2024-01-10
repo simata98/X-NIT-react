@@ -52,10 +52,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # ACCESS Token의 유효기간
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),  # ACCESS Token의 유효기간
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),  # Refresh 토큰의 유효기간
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'BLACKLIST_AFTER_ROTATION': True,            # Refresh Token이 만료되어 갱신되면 BlackList에 등록
     'UPDATE_LAST_LOGIN': False,
 
     'ALGORITHM': 'HS256',

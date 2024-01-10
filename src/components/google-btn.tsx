@@ -35,7 +35,7 @@ export default function GoogleButton() {
   }
   return (
     <Button onClick={onClick}>
-      <Logo src="/public/google-mark.svg" />
+      <Logo src="google-mark.svg" />
       Google로 시작하기
     </Button>
   );

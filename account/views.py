@@ -1,8 +1,6 @@
-import json
-
 from rest_framework.views import APIView
-from rest_framework import generics, status, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import generics, status
+from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -33,11 +31,12 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@permission_classes([IsAuthenticated])
 class FetchUserView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        if request.user:
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        exists = User.objects.filter(username=user).exists()
+        if exists:
             return Response({
                 'exists': True,
             })
@@ -45,23 +44,3 @@ class FetchUserView(APIView):
             return Response({
                 'exists': False,
             })
-
-
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def testEndPoint(request):
-    if request.method == 'GET':
-        data = f"Congratulation {request.user}, your API just responded to GET request"
-        return Response({'response': data}, status=status.HTTP_200_OK)
-    elif request.method == 'POST':
-        try:
-            body = request.body.decode('utf-8')
-            data = json.loads(body)
-            if 'text' not in data:
-                return Response("Invalid JSON data", status.HTTP_400_BAD_REQUEST)
-            text = data.get('text')
-            data = f'Congratulation your API just responded to POST request with text: {text}'
-            return Response({'response': data}, status=status.HTTP_200_OK)
-        except json.JSONDecodeError:
-            return Response("Invalid JSON data", status.HTTP_400_BAD_REQUEST)
-    return Response("Invalid JSON data", status.HTTP_400_BAD_REQUEST)

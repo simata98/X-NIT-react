@@ -69,12 +69,12 @@ export default function CreateAccount() {
       );
 
       await promise;
-      navigate("/");
     } catch (e) {
       toast.error(axios.isAxiosError<{ message: string }>(e));
       navigate("/login")
     } finally {
       setLoading(false);
+      navigate("/login");
     }
     // set the name of the user
     // redirect to homepage

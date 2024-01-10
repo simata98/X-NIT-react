@@ -35,7 +35,7 @@ export default function GithubButton() {
   };
   return (
     <Button onClick={onClick}>
-      <Logo src="/public/github-mark.svg" />
+      <Logo src="github-mark.svg" />
       Github으로 시작하기
     </Button>
   );

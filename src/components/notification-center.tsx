@@ -81,7 +81,7 @@ export default function DescriptionAlerts() {
                         )
                       }
                     >
-                      {notification.content}
+                      {notification.content as React.ReactNode}
                     </Alert>
                   );
                 })}

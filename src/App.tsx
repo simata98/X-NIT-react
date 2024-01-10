@@ -10,7 +10,6 @@ import reset from "styled-reset";
 import LoadingScreen from "./components/loading-screen";
 import ProtectedRoute from "./components/protected-route";
 import { QueryClient, QueryClientProvider } from "react-query";
-
 import {ReactQueryDevtools} from "react-query/devtools";
 
 const queryClient = new QueryClient();

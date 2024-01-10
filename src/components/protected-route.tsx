@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 async function fetchUser() {
   let token = localStorage.getItem("token");
   try {
+    console.log("try문 시행");
     await axios.get(
       "http://localhost:8000/account/fetch-user/",
       {
@@ -20,19 +21,22 @@ async function fetchUser() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((error as any).response.status === 401) { // Unauthorized
       // 토큰 갱신 요청
-      const refreshToken = localStorage.getItem("refreshToken");
+      let refreshToken = localStorage.getItem("refresh_token");
       try {
         const response = await axios.post(
-          "http://localhost:8000/account/refresh/",
+          "http://localhost:8000/account/token/refresh/",
           {
             refresh: refreshToken,
           }
         );
         token = response.data.access;
-        if (token) {
+        refreshToken = response.data.refresh;
+        console.log("Access token : " + token);
+        console.log("Refresh token : " + refreshToken);
+        if (token && refreshToken) {
           localStorage.setItem("token", token);
+          localStorage.setItem("refresh_token", refreshToken);
         }
-
         // 갱신된 토큰으로 사용자 정보 요청 재시도
         await axios.get(
           "http://localhost:8000/account/fetch-user/",
@@ -43,11 +47,25 @@ async function fetchUser() {
           }
         );
       } catch (refreshError) {
-        toast.error("로그인이 만료되었습니다. 다시 로그인 해주세요.");
+        toast.error("토큰 정보가 만료되었습니다. 다시 로그인 해주세요.");
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refresh_token');
+        } catch (error) {
+          console.log(error);
+        }
+        console.log(refreshError)
         throw refreshError;
       }
     } else {
       toast.error("로그인이 만료되었습니다. 다시 로그인 해주세요.");
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+      } catch (error) {
+        console.log(error);
+      }
+      console.log(error);
       throw error;
     }
   }
