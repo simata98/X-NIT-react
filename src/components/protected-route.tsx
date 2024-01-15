@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 async function fetchUser() {
   let token = localStorage.getItem("token");
   try {
-    console.log("try문 시행");
     await axios.get(
       "http://localhost:8000/account/fetch-user/",
       {

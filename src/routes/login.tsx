@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useMutation } from "react-query";
 
+
 export default function Login() {
   const navigate = useNavigate();
   const [isLoading] = useState(false);
@@ -34,10 +35,17 @@ export default function Login() {
         // Save the token in local storage on success
         localStorage.setItem('token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
+        document.cookie = `refresh_token=${data.refresh}; path=/;`;
         toast.success("로그인 성공!");
         navigate("/");
       },
       onError: () => {
+        try {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refresh_token');
+        } catch (e) {
+          console.log(e);
+        }
         toast.error("로그인 실패");
       },
     }
@@ -61,45 +69,6 @@ export default function Login() {
     // create an account
     loginMutation.mutate({ username: email, password });
   };
-  // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const {
-  //     target: { name, value },
-  //   } = e;
-  //   if (name === "email") {
-  //     setEmail(value);
-  //   } else if (name === "password") {
-  //     setPassword(value);
-  //   }
-  // };
-  // const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault(); // prevent default behavior of form
-  //   setShake(false); // reset shake
-  //   if (isLoading || email === "" || password === "") return;
-  //   // create an account
-  //   try {
-  //     setLoading(true);
-  //     const signInPromise = axios.post("http://localhost:8000/account/token/", {
-  //       username: email,
-  //       password: password,
-  //     });
-  //     toast.promise(signInPromise, {
-  //       pending: "로그인 중...",
-  //       success: "로그인 성공!",
-  //       error: "로그인 실패",
-  //     });
-  //     const response = await signInPromise;
-  //     const token = response.data.access;
-  //     localStorage.setItem("token", token);
-  //     navigate("/");
-  //   } catch (e) {
-  //     if (e) {
-  //       toast.error(axios.isAxiosError<{ message: string }>(e));
-  //       setShake(true);
-  //     }
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   return (
     <Wrapper>
       <Content shake={shake ? true : undefined}>
