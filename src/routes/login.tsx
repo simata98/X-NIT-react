@@ -15,7 +15,6 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useMutation } from "react-query";
 
-
 export default function Login() {
   const navigate = useNavigate();
   const [isLoading] = useState(false);
@@ -23,30 +22,39 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [shake, setShake] = useState(false); // shake animation [true, false
   const loginMutation = useMutation(
-    async ({ username, password }: { username: string, password: string }) => {
-      const response = await axios.post("http://localhost:8000/account/token/", {
-        username,
-        password,
+    async ({ username, password }: { username: string; password: string }) => {
+      const url = `127.0.0.1:8000/account/token/`;
+      const promise = axios.post(url, {
+        username : username,
+        password : password,
       });
-      return response.data;
+    
+      const toastId = toast("로그인 중...", { autoClose: false });
+    
+      try {
+        const response = await promise;
+        toast.update(toastId, { type: toast.TYPE.SUCCESS, render: "로그인 성공!", autoClose: 5000 });
+        return response.data;
+      } catch (error) {
+        toast.update(toastId, { type: toast.TYPE.ERROR, render: "로그인 실패", autoClose: 5000 });
+        throw error;
+      } finally {
+        toast.dismiss(toastId);
+      }
     },
     {
       onSuccess: (data) => {
-        // Save the token in local storage on success
-        localStorage.setItem('token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        document.cookie = `refresh_token=${data.refresh}; path=/;`;
-        toast.success("로그인 성공!");
+        localStorage.setItem("token", data.access);
+        localStorage.setItem("refresh_token", data.refresh);
         navigate("/");
       },
       onError: () => {
         try {
-          localStorage.removeItem('token');
-          localStorage.removeItem('refresh_token');
+          localStorage.removeItem("token");
+          localStorage.removeItem("refresh_token");
         } catch (e) {
           console.log(e);
         }
-        toast.error("로그인 실패");
       },
     }
   );
